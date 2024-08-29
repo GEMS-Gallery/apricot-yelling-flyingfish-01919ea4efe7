@@ -1,13 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEM's Showcase</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f7f7f7;
+            --border-color: #e0e0e0;
+            --text-color: #333333;
+            --text-light: #666666;
+            --accent-color: #6772e5;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            background-color: var(--secondary-bg);
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        header {
+            background-color: var(--primary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: calc(100% - 4rem);
+            top: 0;
+            z-index: 1000;
+        }
+        .logo {
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        .logo svg {
+            margin-right: 0.5rem;
+        }
+        .search-bar {
+            flex-grow: 1;
+            margin: 0 2rem;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .header-buttons {
+            display: flex;
+        }
+        .header-buttons button {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            margin-left: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .header-buttons button:hover {
+            background-color: var(--secondary-bg);
+        }
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            margin-top: 60px;
+            height: calc(100vh - 60px);
+            position: fixed;
+            overflow-y: auto;
+        }
+        .sidebar h2 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar li {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .sidebar li:hover {
+            color: var(--accent-color);
+        }
+        .sidebar li svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            margin-left: 250px;
+            margin-top: 60px;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .project-card {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .project-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .project-image {
+            height: 200px;
+            background-color: var(--secondary-bg);
+            position: relative;
+            overflow: hidden;
+        }
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        .project-info {
+            padding: 1rem;
+        }
+        .project-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .project-category {
+            display: inline-block;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            background-color: rgba(103, 114, 229, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        .project-actions {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 1rem;
+        }
+        .project-actions a {
+            display: flex;
+            align-items: center;
+            color: var(--text-color);
+            text-decoration: none;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+        }
+        .project-actions a:hover {
+            color: var(--accent-color);
+        }
+        .project-actions svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+        }
+        .loader {
+            border: 3px solid var(--secondary-bg);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                margin-top: 60px;
+                padding: 1rem;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            header {
+                flex-wrap: wrap;
+            }
+            .search-bar {
+                order: 3;
+                width: 100%;
+                margin: 1rem 0 0;
+            }
+            .header-buttons {
+                margin-left: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3h12l4 6-10 13L2 9z"></path>
+                <path d="M12 22V8"></path>
+            </svg>
+            GEM's Showcase
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search..." id="search-input">
+        </div>
+        <div class="header-buttons">
+            <button>Start Building</button>
+            <button>Learn</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <h2>Categories</h2>
+            <ul id="category-list">
+                <!-- Categories will be dynamically added here -->
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="projects" id="projects-container">
+                <!-- Project cards will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            { title: "Apple", category: "Technology", url: "https://www.apple.com" },
+            { title: "Nike", category: "Retail", url: "https://www.nike.com" },
+            { title: "Spotify", category: "Entertainment", url: "https://www.spotify.com" },
+            { title: "Airbnb", category: "Travel", url: "https://www.airbnb.com" },
+            { title: "Tesla", category: "Automotive", url: "https://www.tesla.com" },
+            { title: "Amazon", category: "E-commerce", url: "https://www.amazon.com" },
+            { title: "Netflix", category: "Entertainment", url: "https://www.netflix.com" },
+            { title: "Google", category: "Technology", url: "https://www.google.com" },
+            { title: "Microsoft", category: "Technology", url: "https://www.microsoft.com" }
+        ];
+
+        const categoryIcons = {
+            "Technology": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',
+            "Retail": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>',
+            "Entertainment": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>',
+            "Travel": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
+            "Automotive": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>',
+            "E-commerce": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>'
+        };
+
+        function createProjectCard(project) {
+            return `
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="loader"></div>
+                        <img src="https://shot.screenshotapi.net/screenshot?token=9B5BMQH-TBT4EQP-NHTEP60-EZ8VFKA&url=${project.url}&output=image&file_type=png&wait_for_event=load" alt="${project.title}" style="opacity: 0;" onload="this.style.opacity=1; this.previousElementSibling.style.display='none';">
+                    </div>
+                    <div class="project-info">
+                        <div class="project-category">${project.category}</div>
+                        <div class="project-title">${project.title}</div>
+                        <div class="project-actions">
+                            <a href="https://github.com" target="_blank">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                            </svg>
+                            GitHub
+                        </a>
+                        <a href="${project.url}" target="_blank">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            Visit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderProjects(projectsToRender) {
+        const container = document.getElementById('projects-container');
+        container.innerHTML = projectsToRender.map(createProjectCard).join('');
+    }
+
+    function renderCategories() {
+        const categoryList = document.getElementById('category-list');
+        const categories = [...new Set(projects.map(project => project.category))];
+        categoryList.innerHTML = categories.map(category => `
+            <li data-category="${category}">
+                ${categoryIcons[category] || ''}
+                ${category}
+            </li>
+        `).join('');
+
+        categoryList.addEventListener('click', function(e) {
+            if (e.target.tagName === 'LI') {
+                const category = e.target.dataset.category;
+                const filteredProjects = category === 'All' 
+                    ? projects 
+                    : projects.filter(project => project.category === category);
+                renderProjects(filteredProjects);
+            }
+        });
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredProjects = projects.filter(project => 
+                project.title.toLowerCase().includes(searchTerm) ||
+                project.category.toLowerCase().includes(searchTerm)
+            );
+            renderProjects(filteredProjects);
+        });
+    }
+
+    renderProjects(projects);
+    renderCategories();
+    initializeSearch();
+</script>
+</body>
 </html>
