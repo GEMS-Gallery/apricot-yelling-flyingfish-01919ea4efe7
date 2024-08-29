@@ -1,0 +1,13 @@
+type Project = 
+ record {
+   category: text;
+   id: nat;
+   title: text;
+   url: text;
+ };
+service : {
+  addProject: (text, text, text) -> (nat);
+  getProjects: () -> (vec Project) query;
+  getProjectsByCategory: (text) -> (vec Project) query;
+  searchProjects: (text) -> (vec Project) query;
+}
