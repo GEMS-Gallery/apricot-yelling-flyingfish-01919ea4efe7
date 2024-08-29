@@ -13,6 +13,7 @@
             --text-color: #333333;
             --text-light: #666666;
             --accent-color: #6772e5;
+            --highlight-bg: #e0e0e0;
         }
         body, html {
             margin: 0;
@@ -104,6 +105,9 @@
         }
         .sidebar li:hover {
             color: var(--accent-color);
+        }
+        .sidebar li.active {
+            background-color: var(--highlight-bg);
         }
         .sidebar li svg {
             width: 20px;
@@ -318,9 +322,9 @@
 
     function renderCategories() {
         const categoryList = document.getElementById('category-list');
-        const categories = [...new Set(projects.map(project => project.category))];
+        const categories = ['All', ...new Set(projects.map(project => project.category))];
         categoryList.innerHTML = categories.map(category => `
-            <li data-category="${category}">
+            <li data-category="${category}" class="${category === 'All' ? 'active' : ''}">
                 ${categoryIcons[category] || ''}
                 ${category}
             </li>
@@ -333,6 +337,10 @@
                     ? projects 
                     : projects.filter(project => project.category === category);
                 renderProjects(filteredProjects);
+
+                // Update active class
+                categoryList.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+                e.target.classList.add('active');
             }
         });
     }
@@ -346,6 +354,10 @@
                 project.category.toLowerCase().includes(searchTerm)
             );
             renderProjects(filteredProjects);
+
+            // Reset active category
+            document.querySelectorAll('#category-list li').forEach(li => li.classList.remove('active'));
+            document.querySelector('#category-list li[data-category="All"]').classList.add('active');
         });
     }
 
